@@ -1,0 +1,17 @@
+{
+  "name": "tree-sitter-luga",
+  "version": "0.1.0",
+  "description": "Tree-sitter grammar for the Luga language",
+  "keywords": ["parser", "tree-sitter", "luga"],
+  "scripts": {
+    "generate": "tree-sitter generate",
+    "test": "tree-sitter test"
+  },
+  "tree-sitter": [
+    {
+      "scope": "source.luga",
+      "file-types": ["luga"],
+      "highlights": "queries/highlights.scm"
+    }
+  ]
+}
