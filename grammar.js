@@ -18,6 +18,8 @@ module.exports = grammar({
     // `Foo { ... }` could start a struct_init or an identifier expression
     // followed by a block; GLR resolves by seeing field:value inside the braces.
     [$.struct_init_path, $._expression],
+    [$._statement, $._expression],
+    [$.struct_declaration],
   ],
 
   rules: {
@@ -61,6 +63,7 @@ module.exports = grammar({
     ),
 
     parameter: $ => seq(
+      optional('ref'),
       field('name', $.identifier),
       ':',
       field('type', $.identifier),
@@ -73,6 +76,12 @@ module.exports = grammar({
       '{',
       repeat($.struct_field),
       '}',
+      optional(seq(
+        '{',
+        $.function_declaration,
+        repeat($.function_declaration),
+        '}',
+      )),
     ),
 
     struct_field: $ => seq(
@@ -114,10 +123,11 @@ module.exports = grammar({
 
     _statement: $ => choice(
       $.return_statement,
-      $.let_statement,
+      $.var_statement,
       $.assignment_statement,
+      $.result_statement,
       $.expression_statement,
-      $.if_statement,
+      $.if_expression,
       $.while_statement,
       $.block,
       $.function_declaration,
@@ -127,8 +137,8 @@ module.exports = grammar({
 
     return_statement: $ => seq('return', $._expression, ';'),
 
-    let_statement: $ => seq(
-      'let',
+    var_statement: $ => seq(
+      'var',
       field('name', $.identifier),
       '=',
       field('value', $._expression),
@@ -137,15 +147,21 @@ module.exports = grammar({
 
     // prec(1) beats expression_statement when the lookahead after identifier is `=`
     assignment_statement: $ => prec(1, seq(
-      field('name', $.identifier),
+      field('target', $._expression),
       '=',
       field('value', $._expression),
       ';',
     )),
 
+    result_statement: $ => seq(
+      '=',
+      field('value', $._expression),
+      ';',
+    ),
+
     expression_statement: $ => seq($._expression, ';'),
 
-    if_statement: $ => seq(
+    if_expression: $ => seq(
       $.if_clause,
       repeat(seq('else', $.if_clause)),
       optional(seq('else', $.block)),
@@ -153,17 +169,14 @@ module.exports = grammar({
 
     if_clause: $ => seq(
       'if',
-      '(',
       field('condition', $._expression),
-      ')',
+      'then',
       field('body', $.block),
     ),
 
     while_statement: $ => seq(
       'while',
-      '(',
       field('condition', $._expression),
-      ')',
       field('body', $.block),
     ),
 
@@ -178,6 +191,8 @@ module.exports = grammar({
       $.field_expression,
       $.struct_init,
       $.intrinsic_call,
+      $.if_expression,
+      $.block,
       $.parenthesized_expression,
       $.identifier,
       $.integer_literal,
@@ -210,7 +225,7 @@ module.exports = grammar({
     ),
 
     unary_expression: $ => prec(PREC.UNARY, seq(
-      field('operator', '!'),
+      field('operator', choice('!', '-', '+')),
       field('operand', $._expression),
     )),
 
@@ -227,8 +242,13 @@ module.exports = grammar({
 
     argument_list: $ => seq(
       '(',
-      commaSep($._expression),
+      commaSep($.argument),
       ')',
+    ),
+
+    argument: $ => seq(
+      optional('ref'),
+      field('value', $._expression),
     ),
 
     // Path.To.Struct { field: expr, ... }

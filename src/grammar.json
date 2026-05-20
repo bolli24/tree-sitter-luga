@@ -213,6 +213,18 @@
       "type": "SEQ",
       "members": [
         {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "ref"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
           "type": "FIELD",
           "name": "name",
           "content": {
@@ -263,6 +275,38 @@
         {
           "type": "STRING",
           "value": "}"
+        },
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "SEQ",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "{"
+                },
+                {
+                  "type": "SYMBOL",
+                  "name": "function_declaration"
+                },
+                {
+                  "type": "REPEAT",
+                  "content": {
+                    "type": "SYMBOL",
+                    "name": "function_declaration"
+                  }
+                },
+                {
+                  "type": "STRING",
+                  "value": "}"
+                }
+              ]
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
         }
       ]
     },
@@ -469,7 +513,7 @@
         },
         {
           "type": "SYMBOL",
-          "name": "let_statement"
+          "name": "var_statement"
         },
         {
           "type": "SYMBOL",
@@ -477,11 +521,15 @@
         },
         {
           "type": "SYMBOL",
+          "name": "result_statement"
+        },
+        {
+          "type": "SYMBOL",
           "name": "expression_statement"
         },
         {
           "type": "SYMBOL",
-          "name": "if_statement"
+          "name": "if_expression"
         },
         {
           "type": "SYMBOL",
@@ -522,12 +570,12 @@
         }
       ]
     },
-    "let_statement": {
+    "var_statement": {
       "type": "SEQ",
       "members": [
         {
           "type": "STRING",
-          "value": "let"
+          "value": "var"
         },
         {
           "type": "FIELD",
@@ -563,10 +611,10 @@
         "members": [
           {
             "type": "FIELD",
-            "name": "name",
+            "name": "target",
             "content": {
               "type": "SYMBOL",
-              "name": "identifier"
+              "name": "_expression"
             }
           },
           {
@@ -588,6 +636,27 @@
         ]
       }
     },
+    "result_statement": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "STRING",
+          "value": "="
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
+        },
+        {
+          "type": "STRING",
+          "value": ";"
+        }
+      ]
+    },
     "expression_statement": {
       "type": "SEQ",
       "members": [
@@ -601,7 +670,7 @@
         }
       ]
     },
-    "if_statement": {
+    "if_expression": {
       "type": "SEQ",
       "members": [
         {
@@ -655,10 +724,6 @@
           "value": "if"
         },
         {
-          "type": "STRING",
-          "value": "("
-        },
-        {
           "type": "FIELD",
           "name": "condition",
           "content": {
@@ -668,7 +733,7 @@
         },
         {
           "type": "STRING",
-          "value": ")"
+          "value": "then"
         },
         {
           "type": "FIELD",
@@ -688,20 +753,12 @@
           "value": "while"
         },
         {
-          "type": "STRING",
-          "value": "("
-        },
-        {
           "type": "FIELD",
           "name": "condition",
           "content": {
             "type": "SYMBOL",
             "name": "_expression"
           }
-        },
-        {
-          "type": "STRING",
-          "value": ")"
         },
         {
           "type": "FIELD",
@@ -739,6 +796,14 @@
         {
           "type": "SYMBOL",
           "name": "intrinsic_call"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "if_expression"
+        },
+        {
+          "type": "SYMBOL",
+          "name": "block"
         },
         {
           "type": "SYMBOL",
@@ -957,8 +1022,21 @@
             "type": "FIELD",
             "name": "operator",
             "content": {
-              "type": "STRING",
-              "value": "!"
+              "type": "CHOICE",
+              "members": [
+                {
+                  "type": "STRING",
+                  "value": "!"
+                },
+                {
+                  "type": "STRING",
+                  "value": "-"
+                },
+                {
+                  "type": "STRING",
+                  "value": "+"
+                }
+              ]
             }
           },
           {
@@ -1041,7 +1119,7 @@
               "members": [
                 {
                   "type": "SYMBOL",
-                  "name": "_expression"
+                  "name": "argument"
                 },
                 {
                   "type": "REPEAT",
@@ -1054,7 +1132,7 @@
                       },
                       {
                         "type": "SYMBOL",
-                        "name": "_expression"
+                        "name": "argument"
                       }
                     ]
                   }
@@ -1081,6 +1159,31 @@
         {
           "type": "STRING",
           "value": ")"
+        }
+      ]
+    },
+    "argument": {
+      "type": "SEQ",
+      "members": [
+        {
+          "type": "CHOICE",
+          "members": [
+            {
+              "type": "STRING",
+              "value": "ref"
+            },
+            {
+              "type": "BLANK"
+            }
+          ]
+        },
+        {
+          "type": "FIELD",
+          "name": "value",
+          "content": {
+            "type": "SYMBOL",
+            "name": "_expression"
+          }
         }
       ]
     },
@@ -1337,6 +1440,13 @@
     [
       "struct_init_path",
       "_expression"
+    ],
+    [
+      "_statement",
+      "_expression"
+    ],
+    [
+      "struct_declaration"
     ]
   ],
   "precedences": [],

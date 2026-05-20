@@ -5,7 +5,8 @@
 "enum" @keyword
 "import" @keyword
 "as" @keyword
-"let" @keyword
+"ref" @keyword
+"var" @keyword
 "return" @keyword.return
 "if" @keyword.conditional
 "else" @keyword.conditional
@@ -30,8 +31,8 @@
 (struct_init_path (identifier) @type)
 
 ; Variables
-(let_statement name: (identifier) @variable)
-(assignment_statement name: (identifier) @variable)
+(var_statement name: (identifier) @variable)
+(assignment_statement target: (identifier) @variable)
 (parameter name: (identifier) @variable.parameter)
 (struct_field name: (identifier) @variable.member)
 (field_expression field: (identifier) @variable.member)
