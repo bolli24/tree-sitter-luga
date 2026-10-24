@@ -1,11 +1,11 @@
 ; Keywords
 "fn" @keyword.function
 "extern" @keyword
-"struct" @keyword
-"enum" @keyword
+"struct" @keyword.type
+"enum" @keyword.type
 "import" @keyword
 "as" @keyword
-"ref" @keyword
+"ref" @keyword.modifier
 "var" @keyword
 "return" @keyword.return
 "if" @keyword.conditional
@@ -43,14 +43,14 @@
 (call_expression function: (field_expression field: (identifier) @function.method))
 
 ; Intrinsics
-"@" @punctuation.special
+(intrinsic_call "@" @function.builtin)
 (intrinsic_call name: (identifier) @function.builtin)
 
 ; Imports
 (import_path (identifier) @module)
 
 ; Literals
-(bool_literal) @constant.builtin
+(bool_literal) @boolean
 (integer_literal) @number
 (float_literal) @number.float
 (string_literal) @string
