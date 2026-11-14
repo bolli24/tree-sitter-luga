@@ -9,6 +9,7 @@
 "var" @keyword
 "return" @keyword.return
 "if" @keyword.conditional
+"then" @keyword.conditional
 "else" @keyword.conditional
 "while" @keyword.repeat
 
@@ -23,12 +24,17 @@
 (struct_field type: (identifier) @type)
 (function_declaration return_type: (identifier) @type)
 (extern_function_declaration return_type: (identifier) @type)
+(var_statement type: (identifier) @type)
 
 ; Enum variants
 (enum_variant (identifier) @constant)
 
-; Struct init path — highlight the type name (last segment)
+; Struct init path — highlight every segment as a type
 (struct_init_path (identifier) @type)
+
+; Builtin variables
+((identifier) @variable.builtin
+  (#eq? @variable.builtin "self"))
 
 ; Variables
 (var_statement name: (identifier) @variable)

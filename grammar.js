@@ -56,9 +56,10 @@ module.exports = grammar({
       ';',
     ),
 
+    // No trailing comma, unlike argument lists.
     parameter_list: $ => seq(
       '(',
-      commaSep($.parameter),
+      optional(seq($.parameter, repeat(seq(',', $.parameter)))),
       ')',
     ),
 
@@ -69,16 +70,15 @@ module.exports = grammar({
       field('type', $.identifier),
     ),
 
-    // struct Name { field: Type; ... }
+    // struct Name { field: Type, ... } { fn method() { ... } ... }
     struct_declaration: $ => seq(
       'struct',
       field('name', $.identifier),
       '{',
-      repeat($.struct_field),
+      commaSep($.struct_field),
       '}',
       optional(seq(
         '{',
-        $.function_declaration,
         repeat($.function_declaration),
         '}',
       )),
@@ -88,7 +88,6 @@ module.exports = grammar({
       field('name', $.identifier),
       ':',
       field('type', $.identifier),
-      ';',
     ),
 
     // enum Name { Variant1, Variant2 }
@@ -140,6 +139,7 @@ module.exports = grammar({
     var_statement: $ => seq(
       'var',
       field('name', $.identifier),
+      optional(seq(':', field('type', $.identifier))),
       '=',
       field('value', $._expression),
       ';',
@@ -225,7 +225,7 @@ module.exports = grammar({
     ),
 
     unary_expression: $ => prec(PREC.UNARY, seq(
-      field('operator', choice('!', '-', '+')),
+      field('operator', choice('!', '-')),
       field('operand', $._expression),
     )),
 
@@ -272,11 +272,16 @@ module.exports = grammar({
       field('value', $._expression),
     ),
 
-    // @intrinsic(args)
+    // @intrinsic(args) — only the intrinsics luga knows; arguments take no `ref`.
     intrinsic_call: $ => seq(
       '@',
-      field('name', $.identifier),
-      field('arguments', $.argument_list),
+      field('name', alias(
+        choice('print', 'println', 'assert', 'exit', 'enumToInt'),
+        $.identifier,
+      )),
+      '(',
+      commaSep(field('argument', $._expression)),
+      ')',
     ),
 
     parenthesized_expression: $ => seq('(', $._expression, ')'),
@@ -286,8 +291,10 @@ module.exports = grammar({
     // -------------------------------------------------------------------------
 
     // Float must be tried before integer so `1.0` isn't lexed as `1` + `.0`.
-    float_literal: $ => token(prec(1, /\d+\.\d+/)),
-    integer_literal: $ => /\d+/,
+    // Like luga's lexer, a directly attached sign is part of the literal
+    // (`-1`, `+2.5`); after an operand, `-`/`+` still lex as binary operators.
+    float_literal: $ => token(prec(1, /[-+]?\d+\.\d+/)),
+    integer_literal: $ => /[-+]?\d+/,
 
     string_literal: $ => token(seq(
       '"',

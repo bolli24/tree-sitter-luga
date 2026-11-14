@@ -936,12 +936,64 @@
     "type": "intrinsic_call",
     "named": true,
     "fields": {
-      "arguments": {
-        "multiple": false,
-        "required": true,
+      "argument": {
+        "multiple": true,
+        "required": false,
         "types": [
           {
-            "type": "argument_list",
+            "type": "binary_expression",
+            "named": true
+          },
+          {
+            "type": "block",
+            "named": true
+          },
+          {
+            "type": "bool_literal",
+            "named": true
+          },
+          {
+            "type": "call_expression",
+            "named": true
+          },
+          {
+            "type": "field_expression",
+            "named": true
+          },
+          {
+            "type": "float_literal",
+            "named": true
+          },
+          {
+            "type": "identifier",
+            "named": true
+          },
+          {
+            "type": "if_expression",
+            "named": true
+          },
+          {
+            "type": "integer_literal",
+            "named": true
+          },
+          {
+            "type": "intrinsic_call",
+            "named": true
+          },
+          {
+            "type": "parenthesized_expression",
+            "named": true
+          },
+          {
+            "type": "string_literal",
+            "named": true
+          },
+          {
+            "type": "struct_init",
+            "named": true
+          },
+          {
+            "type": "unary_expression",
             "named": true
           }
         ]
@@ -1483,10 +1535,6 @@
             "named": false
           },
           {
-            "type": "+",
-            "named": false
-          },
-          {
             "type": "-",
             "named": false
           }
@@ -1501,6 +1549,16 @@
       "name": {
         "multiple": false,
         "required": true,
+        "types": [
+          {
+            "type": "identifier",
+            "named": true
+          }
+        ]
+      },
+      "type": {
+        "multiple": false,
+        "required": false,
         "types": [
           {
             "type": "identifier",
